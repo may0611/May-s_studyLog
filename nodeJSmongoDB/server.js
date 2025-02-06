@@ -58,9 +58,12 @@ app.get('/write', async(요청, 응답)=>{
 
 app.post('/add', async(요청, 응답)=>{
     console.log(요청.body);
-   
-    db.collection('post').insertOne({title:요청.body.title, content: 요청.body.content}, function(err, result){
+   if(요청.body.title==''|| 요청.body.content==''){
+    응답.send('제목 혹은 내용 미입력')
+   }
+   else{ db.collection('post').insertOne({title:요청.body.title, content: 요청.body.content}, function(err, result){
         console.log('데이터 저장 완료')
     })
     응답.redirect('/list');
+}
 });
