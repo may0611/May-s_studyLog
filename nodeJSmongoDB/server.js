@@ -7,7 +7,7 @@ app.set('view engine', 'ejs');
 app.use(express.json())
 app.use(express.urlencoded({extended:true})) 
 
-const { MongoClient } = require('mongodb')
+const { MongoClient, ObjectId } = require('mongodb')
 
 let db
 const url = 'mongodb+srv://maylee202237783:abcd@cluster0.eda2v.mongodb.net/?retryWrites=true&w=majority&appName=Cluster0'
@@ -67,3 +67,11 @@ app.post('/add', async(요청, 응답)=>{
     응답.redirect('/list');
 }
 });
+
+
+app.get('/detail/:aaa', async(요청, 응답)=>{
+    let ID= 요청.params.aaa;
+    let result= await db.collection('post').findOne({_id : new ObjectId(ID)})
+    console.log(result)
+    응답.render('detail.ejs',({_id: result}));
+})
