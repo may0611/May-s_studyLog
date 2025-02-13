@@ -1,7 +1,34 @@
+import * as Location from "expo-location";
 import { StatusBar } from 'expo-status-bar';
-import { StyleSheet, Text, View } from 'react-native'; //사용하기 위해서는 import 받아야 함
+import { useEffect, useState } from 'react';
+import { StyleSheet, Text, View, ScrollView, Dimensions } from 'react-native'; //사용하기 위해서는 import 받아야 함
+const{width:SCREEN_WIDTH}=Dimensions.get('window');
+const API_KEY="2eac196eac95a330ab1ed2427f859f54"
 
 export default function App() {
+    const [city,setCity] = useState("Loding...");
+    const [days, setDays] = useState("Loding...");
+    const [location, setLocation] = useState();
+    const [ok, setOK] = useState(true);
+    const ask = async()=>{
+      const {granted} = await Location.requestForegroundPermissionsAsync();
+      if(!granted){
+        setOK(false);
+      }
+      const {coords:{latitude,longitude }} = await Location.getCurrentPositionAsync({accuracy: 5});
+      const location = await Location.reverseGeocodeAsync({latitude, longitude}, {useGoogleMaps: false})
+      setCity(location[0].city);
+
+      const response = await fetch('https://api.openweathermap.org/data/2.5/onecall?lat={latitude}&lon={longitude}&exclude={alerts}&appid={API_KEY}');
+      const json = await response. json();
+      console.log("hello");
+      console.log(json);
+    }
+    useEffect(()=>{
+      ask();
+    }, [])
+
+
   return (
     
     <View style={styles.container}>
@@ -9,13 +36,36 @@ export default function App() {
       <StatusBar style= "light" /> 
 
       <View style={styles.city}>
-        <Text style={styles.cityName}>SEOUL</Text>
+        <Text style={styles.cityName}>{city}</Text>
       </View>
 
-      <View style={styles.weather}>
+      <ScrollView
+       horizontal
+       showsHorizontalScrollIndicator={false}
+       pagingEnabled
+      contentContainerStyle={styles.weather}>
+        <View style={styles.day}>
         <Text style={styles.tempStatus}>27</Text>
         <Text style={styles.weatherStatus}>Hot</Text>
-      </View>
+        </View>
+        <View style={styles.day}>
+        <Text style={styles.tempStatus}>27</Text>
+        <Text style={styles.weatherStatus}>Hot</Text>
+        </View>
+        <View style={styles.day}>
+        <Text style={styles.tempStatus}>27</Text>
+        <Text style={styles.weatherStatus}>Hot</Text>
+        </View>
+        <View style={styles.day}>
+        <Text style={styles.tempStatus}>27</Text>
+        <Text style={styles.weatherStatus}>Hot</Text>
+        </View>
+        <View style={styles.day}>
+        <Text style={styles.tempStatus}>27</Text>
+        <Text style={styles.weatherStatus}>Hot</Text>
+        </View>
+
+      </ScrollView>
 
     </View>
   )
@@ -41,7 +91,10 @@ const styles = StyleSheet.create({
   }, //도시이름 글자의 설정
 
   weather: {
-    flex: 3,
+   
+  },
+  day:{
+     width: SCREEN_WIDTH,
      backgroundColor: "hotpink",
      alignItems: "left",
   },  //날씨 들어가는 부분의 설정
@@ -58,7 +111,7 @@ const styles = StyleSheet.create({
     color: "gray",
     fontSize:60,
     fontWeight: "300",
-  } //날씨 글씨 설정
+  } //날씨 글
 
   
 });
